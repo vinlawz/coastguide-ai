@@ -106,7 +106,8 @@ export async function generateItinerary(req: ItineraryRequest): Promise<Itinerar
     const parsed = JSON.parse(jsonMatch ? jsonMatch[0] : raw);
     if (!parsed.days || !Array.isArray(parsed.days)) throw new Error("bad shape");
     return { ...parsed, source: "ai" } as ItineraryResponse;
-  } catch {
+  } catch (err) {
+    console.error("Failed to parse AI itinerary response", err, "raw:", raw);
     return fallbackItinerary(req);
   }
 }
