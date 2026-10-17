@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { categories, getDestinationById } from "@/data/destinations";
+import { PLAN_WITH_CATEGORY_EVENT } from "@/lib/events";
 import type {
   ChatMessage,
   DestinationCategory,
@@ -15,6 +16,12 @@ const paces = ["Relaxed", "Balanced", "Packed"] as const;
 
 export default function Assistant() {
   const [tab, setTab] = useState<"plan" | "ask">("plan");
+
+  useEffect(() => {
+    const onPlanRequest = () => setTab("plan");
+    window.addEventListener(PLAN_WITH_CATEGORY_EVENT, onPlanRequest);
+    return () => window.removeEventListener(PLAN_WITH_CATEGORY_EVENT, onPlanRequest);
+  }, []);
 
   return (
     <div className="rounded-2xl border border-black/10 bg-white/60 p-4">
@@ -45,6 +52,15 @@ function TripPlanner() {
   const [pace, setPace] = useState<(typeof paces)[number]>("Balanced");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<ItineraryResponse | null>(null);
+
+  useEffect(() => {
+    const onPlanRequest = (e: Event) => {
+      const category = (e as CustomEvent<DestinationCategory>).detail;
+      setInterests((prev) => (prev.includes(category) ? prev : [...prev, category]));
+    };
+    window.addEventListener(PLAN_WITH_CATEGORY_EVENT, onPlanRequest);
+    return () => window.removeEventListener(PLAN_WITH_CATEGORY_EVENT, onPlanRequest);
+  }, []);
 
   function toggleInterest(c: DestinationCategory) {
     setInterests((prev) => (prev.includes(c) ? prev.filter((i) => i !== c) : [...prev, c]));
@@ -175,9 +191,16 @@ function AskCoastGuide() {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
 
-  async function send() {
-    if (!input.trim()) return;
-    const next = [...messages, { role: "user", content: input } as ChatMessage];
+  const suggestions = [
+    "Is it safe to swim in Diani in October?",
+    "Where should a culture lover go first?",
+    "How do I keep this trip sustainable?",
+  ];
+
+  async function send(question?: string) {
+    const text = question ?? input;
+    if (!text.trim()) return;
+    const next = [...messages, { role: "user", content: text } as ChatMessage];
     setMessages(next);
     setInput("");
     setLoading(true);
@@ -208,6 +231,19 @@ function AskCoastGuide() {
           </div>
         ))}
       </div>
+      {messages.length === 1 && (
+        <div className="flex flex-wrap gap-2">
+          {suggestions.map((s) => (
+            <button
+              key={s}
+              onClick={() => send(s)}
+              className="rounded-full border border-ocean-mid/30 px-3 py-1 text-xs text-ocean-mid hover:bg-ocean-mid/10"
+            >
+              {s}
+            </button>
+          ))}
+        </div>
+      )}
       <div className="flex gap-2">
         <input
           value={input}
@@ -216,7 +252,7 @@ function AskCoastGuide() {
           placeholder="e.g. Is Diani safe for swimming in July?"
           className="flex-1 rounded-lg border border-black/15 p-2 text-sm"
         />
-        <button onClick={send} disabled={loading} className="rounded-lg bg-ocean-mid px-4 text-sm text-white disabled:opacity-60">
+        <button onClick={() => send()} disabled={loading} className="rounded-lg bg-ocean-mid px-4 text-sm text-white disabled:opacity-60">
           {loading ? "…" : "Send"}
         </button>
       </div>

@@ -5,6 +5,7 @@ import dynamic from "next/dynamic";
 import { destinations, categories } from "@/data/destinations";
 import type { Destination, DestinationCategory } from "@/lib/types";
 import WeatherWidget from "@/components/WeatherWidget";
+import { requestPlanForCategory } from "@/lib/events";
 
 const CoastMap = dynamic(() => import("@/components/CoastMap"), {
   ssr: false,
@@ -72,6 +73,15 @@ export default function Explorer() {
             </div>
             <WeatherWidget destination={selected} />
             <p className="mt-2 text-xs italic text-ocean-mid">{selected.sustainabilityNote}</p>
+            <button
+              onClick={() => {
+                requestPlanForCategory(selected.category);
+                document.getElementById("plan")?.scrollIntoView({ behavior: "smooth" });
+              }}
+              className="mt-3 rounded-lg bg-coral px-3 py-1.5 text-xs font-medium text-white transition hover:bg-coral/90"
+            >
+              Plan a trip around here
+            </button>
           </div>
         )}
         <div className="h-[560px] overflow-hidden rounded-2xl border border-black/10">
