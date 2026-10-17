@@ -29,10 +29,14 @@ async function callChatModel(messages: { role: string; content: string }[]): Pro
         temperature: 0.6,
       }),
     });
-    if (!res.ok) return null;
+    if (!res.ok) {
+      console.error("AI provider error", res.status, await res.text());
+      return null;
+    }
     const data = await res.json();
     return data?.choices?.[0]?.message?.content ?? null;
-  } catch {
+  } catch (err) {
+    console.error("AI provider fetch failed", err);
     return null;
   }
 }
