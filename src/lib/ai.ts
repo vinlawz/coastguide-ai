@@ -15,7 +15,10 @@ function destinationsContext(): string {
 }
 
 async function callChatModel(messages: { role: string; content: string }[]): Promise<string | null> {
-  if (!AI_API_KEY) return null;
+  if (!AI_API_KEY) {
+    console.error("AI_API_KEY is not set at runtime");
+    return null;
+  }
   try {
     const res = await fetch(`${AI_BASE_URL}/chat/completions`, {
       method: "POST",
