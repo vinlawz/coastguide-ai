@@ -6,14 +6,6 @@ import { destinations, categories } from "@/data/destinations";
 import type { Destination, DestinationCategory } from "@/lib/types";
 import WeatherWidget from "@/components/WeatherWidget";
 
-const categoryIcon: Record<DestinationCategory, string> = {
-  Beaches: "🏖️",
-  "Marine & Wildlife": "🐢",
-  "Culture & Heritage": "🏛️",
-  "Adventure & Water Sports": "🪁",
-  "Eco & Nature": "🌿",
-};
-
 const CoastMap = dynamic(() => import("@/components/CoastMap"), {
   ssr: false,
   loading: () => (
@@ -46,7 +38,7 @@ export default function Explorer() {
                   : "border-ocean-mid/30 text-ocean-mid hover:bg-ocean-mid/10"
               }`}
             >
-              {c === "All" ? "All" : `${categoryIcon[c]} ${c}`}
+              {c}
             </button>
           ))}
         </div>
@@ -62,7 +54,7 @@ export default function Explorer() {
             >
               <div className="flex items-center justify-between">
                 <span className="font-semibold">{d.name}</span>
-                <span className="text-xs text-ocean-mid">{categoryIcon[d.category]} {d.category}</span>
+                <span className="text-xs text-ocean-mid">{d.category}</span>
               </div>
               <p className="mt-1 text-sm text-black/70">{d.description}</p>
               <p className="mt-1 text-xs text-black/50">{d.region} · ~{d.idealHours}h visit</p>
@@ -75,13 +67,11 @@ export default function Explorer() {
         {selected && (
           <div className="rounded-2xl border border-black/10 bg-white/70 p-4">
             <div className="flex items-center justify-between">
-              <h3 className="font-semibold">
-                {categoryIcon[selected.category]} {selected.name}
-              </h3>
+              <h3 className="font-semibold">{selected.name}</h3>
               <span className="text-xs text-black/50">{selected.region}</span>
             </div>
             <WeatherWidget destination={selected} />
-            <p className="mt-2 text-xs italic text-ocean-mid">🌱 {selected.sustainabilityNote}</p>
+            <p className="mt-2 text-xs italic text-ocean-mid">{selected.sustainabilityNote}</p>
           </div>
         )}
         <div className="h-[560px] overflow-hidden rounded-2xl border border-black/10">

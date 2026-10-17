@@ -3,19 +3,19 @@
 import { useEffect, useState } from "react";
 import type { Destination } from "@/lib/types";
 
-const weatherIcon: Record<number, string> = {
-  0: "☀️",
-  1: "🌤️",
-  2: "⛅",
-  3: "☁️",
-  45: "🌫️",
-  48: "🌫️",
-  51: "🌦️",
-  61: "🌧️",
-  63: "🌧️",
-  65: "🌧️",
-  80: "🌧️",
-  95: "⛈️",
+const weatherLabel: Record<number, string> = {
+  0: "Clear",
+  1: "Mostly clear",
+  2: "Partly cloudy",
+  3: "Cloudy",
+  45: "Foggy",
+  48: "Foggy",
+  51: "Light drizzle",
+  61: "Rain",
+  63: "Rain",
+  65: "Heavy rain",
+  80: "Showers",
+  95: "Thunderstorm",
 };
 
 interface WeatherData {
@@ -46,9 +46,10 @@ export default function WeatherWidget({ destination }: { destination: Destinatio
 
   return (
     <div className="flex items-center gap-2 rounded-xl bg-ocean-mid/10 px-3 py-2 text-sm">
-      <span className="text-lg">{weatherIcon[weather.weather_code] ?? "🌊"}</span>
       <span className="font-medium">{Math.round(weather.temperature_2m)}°C</span>
-      <span className="text-black/50">now in {destination.name} · wind {Math.round(weather.wind_speed_10m)} km/h</span>
+      <span className="text-black/50">
+        {weatherLabel[weather.weather_code] ?? "Weather"} now in {destination.name} · wind {Math.round(weather.wind_speed_10m)} km/h
+      </span>
     </div>
   );
 }
